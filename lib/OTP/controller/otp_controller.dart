@@ -1,30 +1,9 @@
 import 'dart:async';
 import 'dart:math';
-import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:http/http.dart' as http;
 
-void main() {
-  runApp(MyApp());
-}
-
-class MyApp extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return const GetMaterialApp(
-      home: OtpTest(),
-    );
-  }
-}
-
-class OtpTest extends StatefulWidget {
-  const OtpTest({super.key});
-
-  @override
-  State<OtpTest> createState() => _OtpTestState();
-}
-
-class _OtpTestState extends State<OtpTest> {
+class OTPController extends GetxController {
   final RxBool isButtonDisabled = false.obs;
 
   final RxInt countdown = 5.obs;
@@ -38,7 +17,7 @@ class _OtpTestState extends State<OtpTest> {
     return otpValue.toString();
   }
 
-  void _onButtonPressed() {
+  void onButtonPressed() {
     otp.value = generateOTP();
     isButtonDisabled.value = true;
 
@@ -46,7 +25,7 @@ class _OtpTestState extends State<OtpTest> {
 
     makeGetRequest();
 
-    Timer.periodic(Duration(seconds: 1), (timer) {
+    Timer.periodic(const Duration(seconds: 1), (timer) {
       countdown.value -= 1;
 
       if (countdown.value == 0) {
@@ -54,35 +33,6 @@ class _OtpTestState extends State<OtpTest> {
         timer.cancel();
       }
     });
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text('Disable Button Example'),
-      ),
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Obx(
-              () => ElevatedButton(
-                onPressed: isButtonDisabled.value ? null : _onButtonPressed,
-                child: Text('Press Me'),
-              ),
-            ),
-            const SizedBox(height: 16),
-            Obx(() => Text(
-                  isButtonDisabled.value
-                      ? 'Button Disabled for ${countdown.value} seconds'
-                      : '',
-                  style: TextStyle(fontSize: 16),
-                )),
-          ],
-        ),
-      ),
-    );
   }
 
   void makeGetRequest() async {

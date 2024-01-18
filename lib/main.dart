@@ -1,3 +1,4 @@
+import 'package:desktopapp/test/timer_test.dart';
 import 'package:desktopapp/view/moive_page.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get_navigation/src/root/get_material_app.dart';
@@ -16,6 +17,6 @@ class MyApp extends StatelessWidget {
         title: 'Movie Test',
         debugShowCheckedModeBanner: false,
         theme: ThemeData(primaryColor: Colors.white),
-        home: const MovieScreen());
+        home: const OtpTest());
   }
 }
