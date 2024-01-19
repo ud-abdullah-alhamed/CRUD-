@@ -1,30 +1,33 @@
 import 'dart:convert';
 
+import 'package:desktopapp/Favorites/model/ChargingStation%20.dart';
 import 'package:flutter/material.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:http/http.dart' as http;
-import '../model/ChargingStation .dart';
 
-class CharchingScreen extends StatefulWidget {
-  const CharchingScreen({super.key});
+class MobileCharchingStations extends StatefulWidget {
+  const MobileCharchingStations({super.key});
 
   @override
-  State<CharchingScreen> createState() => _CharchingScreenState();
+  State<MobileCharchingStations> createState() =>
+      _MobileCharchingStationsState();
 }
 
-class _CharchingScreenState extends State<CharchingScreen> {
+class _MobileCharchingStationsState extends State<MobileCharchingStations> {
+  late Box<ChargingStation> mobileCharchingBox;
   late Box<ChargingStation> charchingBox;
 
   @override
   void initState() {
     super.initState();
-    fetchCharching();
+    mobileCharchingBox = Hive.box<ChargingStation>('MobilecharchingStation');
     charchingBox = Hive.box<ChargingStation>('charchingStation');
+    fetchCharching();
   }
 
   Future<void> fetchCharching() async {
     final response = await http.get(Uri.parse(
-        'https://adventurous-yak-pajamas.cyclic.app/stations/getStationsByType/home_charging_provider'));
+        'https://adventurous-yak-pajamas.cyclic.app/stations/getStationsByType/mobile_charging'));
     if (response.statusCode == 200) {
       final List<dynamic> jsonData = json.decode(response.body);
 
@@ -32,10 +35,10 @@ class _CharchingScreenState extends State<CharchingScreen> {
           jsonData.map((item) => ChargingStation.fromJson(item)).toList();
 
       for (var charching in charching) {
-        if (charchingBox.containsKey(charching.id)) {
-          charching.liked = charchingBox.get(charching.id)!.liked;
+        if (mobileCharchingBox.containsKey(charching.id)) {
+          charching.liked = mobileCharchingBox.get(charching.id)!.liked;
         }
-        charchingBox.put(charching.id, charching);
+        mobileCharchingBox.put(charching.id, charching);
       }
       setState(() {});
     } else {
@@ -44,9 +47,10 @@ class _CharchingScreenState extends State<CharchingScreen> {
   }
 
   void toggleLike(String charchingID) {
-    ChargingStation chargingStation = charchingBox.get(charchingID)!;
+    ChargingStation chargingStation = mobileCharchingBox.get(charchingID)!;
     chargingStation.liked = !chargingStation.liked;
-    charchingBox.put(charchingID, chargingStation);
+    mobileCharchingBox.put(charchingID, chargingStation);
+
     setState(() {});
   }
 
@@ -54,7 +58,7 @@ class _CharchingScreenState extends State<CharchingScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       body: ValueListenableBuilder(
-        valueListenable: charchingBox.listenable(),
+        valueListenable: mobileCharchingBox.listenable(),
         builder: (context, Box<ChargingStation> box, _) {
           return ListView.builder(
               itemCount: box.length,
@@ -63,7 +67,10 @@ class _CharchingScreenState extends State<CharchingScreen> {
                 return ListTile(
                   title: Text(chargingStation.title),
                   trailing: IconButton(
-                    onPressed: () => toggleLike(chargingStation.id),
+                    onPressed: () => {
+                      toggleLike(chargingStation.id),
+                      savedFav(chargingStation)
+                    },
                     icon: Icon(
                       chargingStation.liked
                           ? Icons.favorite
@@ -77,11 +84,33 @@ class _CharchingScreenState extends State<CharchingScreen> {
       ),
     );
   }
+
+  void savedFav(ChargingStation chargingID) {
+    String x = chargingID.id;
+    ChargingStation? chargingStation = charchingBox.get(x);
+
+    if (chargingStation != null) {
+      // ChargingStation found in the box, toggle the liked status
+      chargingStation.liked = !chargingStation.liked;
+      charchingBox.put(x, chargingStation);
+    } else {
+      // ChargingStation not found in the box, add a new one
+      chargingStation = ChargingStation(
+          id: x,
+          liked: true,
+          title: chargingID.title,
+          features: chargingID.features,
+          type: chargingID.type); // Adjust constructor as needed
+      charchingBox.put(x, chargingStation);
+    }
+
+    setState(() {});
+  }
 }
 
-class CharchingStationsAdapter extends TypeAdapter<ChargingStation> {
+class MobileCharchingStationsAdapter extends TypeAdapter<ChargingStation> {
   @override
-  final int typeId = 3;
+  final int typeId = 4;
 
   @override
   ChargingStation read(BinaryReader reader) {

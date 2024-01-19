@@ -1,24 +1,25 @@
 import 'dart:convert';
 
+import 'package:desktopapp/Favorites/model/ChargingStation%20.dart';
 import 'package:flutter/material.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:http/http.dart' as http;
-import '../model/ChargingStation .dart';
 
-class CharchingScreen extends StatefulWidget {
-  const CharchingScreen({super.key});
+class HomeCharchingStations extends StatefulWidget {
+  const HomeCharchingStations({super.key});
 
   @override
-  State<CharchingScreen> createState() => _CharchingScreenState();
+  State<HomeCharchingStations> createState() => _HomeCharchingStationsState();
 }
 
-class _CharchingScreenState extends State<CharchingScreen> {
+class _HomeCharchingStationsState extends State<HomeCharchingStations> {
+  late Box<ChargingStation> homecharchingBox;
   late Box<ChargingStation> charchingBox;
-
   @override
   void initState() {
     super.initState();
     fetchCharching();
+    homecharchingBox = Hive.box<ChargingStation>('HomecharchingStation');
     charchingBox = Hive.box<ChargingStation>('charchingStation');
   }
 
@@ -32,10 +33,10 @@ class _CharchingScreenState extends State<CharchingScreen> {
           jsonData.map((item) => ChargingStation.fromJson(item)).toList();
 
       for (var charching in charching) {
-        if (charchingBox.containsKey(charching.id)) {
-          charching.liked = charchingBox.get(charching.id)!.liked;
+        if (homecharchingBox.containsKey(charching.id)) {
+          charching.liked = homecharchingBox.get(charching.id)!.liked;
         }
-        charchingBox.put(charching.id, charching);
+        homecharchingBox.put(charching.id, charching);
       }
       setState(() {});
     } else {
@@ -44,9 +45,10 @@ class _CharchingScreenState extends State<CharchingScreen> {
   }
 
   void toggleLike(String charchingID) {
-    ChargingStation chargingStation = charchingBox.get(charchingID)!;
+    ChargingStation chargingStation = homecharchingBox.get(charchingID)!;
     chargingStation.liked = !chargingStation.liked;
-    charchingBox.put(charchingID, chargingStation);
+    homecharchingBox.put(charchingID, chargingStation);
+
     setState(() {});
   }
 
@@ -54,7 +56,7 @@ class _CharchingScreenState extends State<CharchingScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       body: ValueListenableBuilder(
-        valueListenable: charchingBox.listenable(),
+        valueListenable: homecharchingBox.listenable(),
         builder: (context, Box<ChargingStation> box, _) {
           return ListView.builder(
               itemCount: box.length,
@@ -63,7 +65,10 @@ class _CharchingScreenState extends State<CharchingScreen> {
                 return ListTile(
                   title: Text(chargingStation.title),
                   trailing: IconButton(
-                    onPressed: () => toggleLike(chargingStation.id),
+                    onPressed: () => {
+                      toggleLike(chargingStation.id),
+                      savedFav(chargingStation)
+                    },
                     icon: Icon(
                       chargingStation.liked
                           ? Icons.favorite
@@ -77,11 +82,33 @@ class _CharchingScreenState extends State<CharchingScreen> {
       ),
     );
   }
+
+  void savedFav(ChargingStation chargingID) {
+    String x = chargingID.id;
+    ChargingStation? chargingStation = charchingBox.get(x);
+
+    if (chargingStation != null) {
+      // ChargingStation found in the box, toggle the liked status
+      chargingStation.liked = !chargingStation.liked;
+      charchingBox.put(x, chargingStation);
+    } else {
+      // ChargingStation not found in the box, add a new one
+      chargingStation = ChargingStation(
+          id: x,
+          liked: true,
+          title: chargingID.title,
+          features: chargingID.features,
+          type: chargingID.type); // Adjust constructor as needed
+      charchingBox.put(x, chargingStation);
+    }
+
+    setState(() {});
+  }
 }
 
-class CharchingStationsAdapter extends TypeAdapter<ChargingStation> {
+class HomeCharchingStationsAdapter extends TypeAdapter<ChargingStation> {
   @override
-  final int typeId = 3;
+  final int typeId = 2;
 
   @override
   ChargingStation read(BinaryReader reader) {

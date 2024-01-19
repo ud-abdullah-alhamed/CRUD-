@@ -16,7 +16,7 @@ class ChargingStation {
     this.address = "",
     this.coordinates = "",
     this.number = "",
-    this.type = "",
+    required this.type,
     required this.features,
     this.liked = false,
   });
