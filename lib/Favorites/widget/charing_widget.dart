@@ -50,7 +50,7 @@ class ChargingStationCard extends StatelessWidget {
                 width: 200,
                 height: 56,
                 child: ListView.builder(
-                    padding: EdgeInsets.all(10),
+                    padding: const EdgeInsets.all(10),
                     shrinkWrap: true,
                     itemCount: feathers.length,
                     itemBuilder: (context, index) {

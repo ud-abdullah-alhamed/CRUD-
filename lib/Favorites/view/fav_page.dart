@@ -13,6 +13,7 @@ class _LikedItemsScreenState extends State<LikedItemsScreen> {
   late Box<ChargingStation> allcharchingBox;
   late Box<ChargingStation> homecharchingBox;
   late Box<ChargingStation> mobileCharchingBox;
+  late Box<ChargingStation> googleMapCharchingBox;
 
   @override
   void initState() {
@@ -22,6 +23,9 @@ class _LikedItemsScreenState extends State<LikedItemsScreen> {
     homecharchingBox = Hive.box<ChargingStation>('HomecharchingStation');
 
     mobileCharchingBox = Hive.box<ChargingStation>('MobilecharchingStation');
+
+    googleMapCharchingBox =
+        Hive.box<ChargingStation>('GoogleMapcharchingStation');
   }
 
   List<ChargingStation> getLikedItems() {
@@ -36,7 +40,7 @@ class _LikedItemsScreenState extends State<LikedItemsScreen> {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text('Liked Items'),
+        title: const Text('Liked Items'),
       ),
       body: ListView.builder(
         itemCount: likedItems.length,
@@ -50,7 +54,9 @@ class _LikedItemsScreenState extends State<LikedItemsScreen> {
                 if (chargingStation.type == "home_charging_provider")
                   {savedFavHome(chargingStation)}
                 else if (chargingStation.type == "mobile_charging")
-                  {savedFavMobile(chargingStation)},
+                  {savedFavMobile(chargingStation)}
+                else if (chargingStation.type == "charging_station")
+                  {savedFavGoogleMap(chargingStation)},
                 print(chargingStation.id),
                 print(chargingStation.type)
               },
@@ -111,6 +117,28 @@ class _LikedItemsScreenState extends State<LikedItemsScreen> {
           features: chargingID.features,
           type: chargingID.type); // Adjust constructor as needed
       mobileCharchingBox.put(x, chargingStation);
+    }
+
+    setState(() {});
+  }
+
+  void savedFavGoogleMap(ChargingStation chargingID) {
+    String x = chargingID.id;
+    ChargingStation? chargingStation = googleMapCharchingBox.get(x);
+
+    if (chargingStation != null) {
+      // ChargingStation found in the box, toggle the liked status
+      chargingStation.liked = !chargingStation.liked;
+      googleMapCharchingBox.put(x, chargingStation);
+    } else {
+      // ChargingStation not found in the box, add a new one
+      chargingStation = ChargingStation(
+          id: x,
+          liked: true,
+          title: chargingID.title,
+          features: chargingID.features,
+          type: chargingID.type); // Adjust constructor as needed
+      googleMapCharchingBox.put(x, chargingStation);
     }
 
     setState(() {});

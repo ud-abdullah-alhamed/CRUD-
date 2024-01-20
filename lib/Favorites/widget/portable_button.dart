@@ -1,6 +1,5 @@
 import 'package:desktopapp/theme/theme.dart';
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
 
 class PortableChargerButton extends StatelessWidget {
   const PortableChargerButton({super.key, required this.phone});

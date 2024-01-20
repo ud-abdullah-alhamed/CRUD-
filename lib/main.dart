@@ -5,6 +5,7 @@ import 'package:desktopapp/Favorites/view/charching_station.dart';
 import 'package:desktopapp/Favorites/view/fav_page.dart';
 import 'package:desktopapp/Favorites/view/favorites_screen.dart';
 import 'package:desktopapp/Favorites/view/getx_favorite.dart';
+import 'package:desktopapp/Favorites/view/google_map_charching.dart';
 import 'package:desktopapp/Favorites/view/mobile_charging.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -16,11 +17,13 @@ void main() async {
   Hive.registerAdapter(CharchingStationsAdapter());
   Hive.registerAdapter(HomeCharchingStationsAdapter());
   Hive.registerAdapter(MobileCharchingStationsAdapter());
+  Hive.registerAdapter(GoogleMapCharchingStationsAdapter());
   await Hive.openBox<Post>('posts');
   await Hive.openBox<Post>('postsWithGetx');
   await Hive.openBox<ChargingStation>('charchingStation');
   await Hive.openBox<ChargingStation>('HomecharchingStation');
   await Hive.openBox<ChargingStation>('MobilecharchingStation');
+  await Hive.openBox<ChargingStation>('GoogleMapcharchingStation');
   runApp(const MyApp());
 }
 
@@ -48,15 +51,9 @@ class MainWidget extends StatelessWidget {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            ElevatedButton(
-                onPressed: () => Get.to(const FavoritePage()),
-                child: const Text('favorites page with Hive')),
-            ElevatedButton(
-                onPressed: () => Get.to(const FavoritePageWithGetx()),
-                child: const Text('favorites page with Hive And getx')),
-            ElevatedButton(
-                onPressed: () => Get.to(const CharchingScreen()),
-                child: const Text('data')),
+            // ElevatedButton(
+            //     onPressed: () => Get.to(const CharchingScreen()),
+            //     child: const Text('Error Fixed')),
             ElevatedButton(
                 onPressed: () => Get.to(const LikedItemsScreen()),
                 child: const Text('All Liked Data')),
@@ -66,6 +63,9 @@ class MainWidget extends StatelessWidget {
             ElevatedButton(
                 onPressed: () => Get.to(const HomeCharchingStations()),
                 child: const Text('Home charching statios')),
+            ElevatedButton(
+                onPressed: () => Get.to(const GoogleMapCharchungStations()),
+                child: const Text('Google Map charching statios')),
           ],
         ),
       ),

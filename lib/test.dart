@@ -66,19 +66,20 @@ class HomeController extends GetxController {
 }
 
 class HomeScreen extends StatelessWidget {
-  final HomeController controller = Get.put(HomeController());
-
+  const HomeScreen({super.key});
   @override
   Widget build(BuildContext context) {
+    final HomeController controller = Get.put(HomeController());
+
     return Scaffold(
       appBar: AppBar(
-        title: Text('Charging Stations'),
+        title: const Text('Charging Stations'),
       ),
       body: Center(
         child: Obx(
           () {
             if (controller.chargingStations.isEmpty) {
-              return CircularProgressIndicator();
+              return const CircularProgressIndicator();
             } else {
               return ListView.builder(
                 itemCount: controller.chargingStations.length,
@@ -103,7 +104,7 @@ class HomeScreen extends StatelessWidget {
 
 void main() {
   runApp(
-    GetMaterialApp(
+    const GetMaterialApp(
       home: HomeScreen(),
     ),
   );
