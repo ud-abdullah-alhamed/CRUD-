@@ -1,25 +1,20 @@
 import 'package:desktopapp/Favorites/model/ChargingStation%20.dart';
-import 'package:desktopapp/Favorites/model/post_model.dart';
 import 'package:desktopapp/Favorites/view/Home_stations.dart';
 import 'package:desktopapp/Favorites/view/charching_station.dart';
 import 'package:desktopapp/Favorites/view/fav_page.dart';
-import 'package:desktopapp/Favorites/view/favorites_screen.dart';
-import 'package:desktopapp/Favorites/view/getx_favorite.dart';
 import 'package:desktopapp/Favorites/view/google_map_charching.dart';
 import 'package:desktopapp/Favorites/view/mobile_charging.dart';
+import 'package:desktopapp/review_getx/review_getx.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 
 void main() async {
   await Hive.initFlutter();
-  Hive.registerAdapter(PostAdapter());
   Hive.registerAdapter(CharchingStationsAdapter());
   Hive.registerAdapter(HomeCharchingStationsAdapter());
   Hive.registerAdapter(MobileCharchingStationsAdapter());
   Hive.registerAdapter(GoogleMapCharchingStationsAdapter());
-  await Hive.openBox<Post>('posts');
-  await Hive.openBox<Post>('postsWithGetx');
   await Hive.openBox<ChargingStation>('charchingStation');
   await Hive.openBox<ChargingStation>('HomecharchingStation');
   await Hive.openBox<ChargingStation>('MobilecharchingStation');
@@ -37,7 +32,7 @@ class MyApp extends StatelessWidget {
         title: 'Test Templete',
         debugShowCheckedModeBanner: false,
         theme: ThemeData(primaryColor: Colors.white),
-        home: const MainWidget());
+        home: PostListPage());
   }
 }
 
